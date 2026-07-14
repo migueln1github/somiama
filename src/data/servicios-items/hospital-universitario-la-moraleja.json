@@ -1,0 +1,8 @@
+{
+  "nombre": "Hospital Universitario La Moraleja",
+  "tipo": "Privado",
+  "direccion": "Avda. de Francisco Pi y Margall, 81, 28050 Madrid",
+  "descripcion": "UCI de adultos con 9 puestos independientes, cobertura médica 24h por intensivista.",
+  "lat": 40.5187,
+  "lng": -3.6423
+}
