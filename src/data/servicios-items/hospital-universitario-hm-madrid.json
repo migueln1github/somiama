@@ -1,0 +1,8 @@
+{
+  "nombre": "Hospital Universitario HM Madrid",
+  "tipo": "Privado",
+  "direccion": "Pl. del Conde del Valle de Súchil, 3, 28015 Madrid",
+  "descripcion": "UCI con tecnología de monitorización avanzada; parte del grupo HM Hospitales.",
+  "lat": 40.4406,
+  "lng": -3.7096
+}
