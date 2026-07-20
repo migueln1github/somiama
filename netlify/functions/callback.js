@@ -1,7 +1,7 @@
 // Paso 2: GitHub redirige aquí de vuelta con un código. Lo cambiamos por un
 // token de acceso y se lo pasamos al panel /admin mediante postMessage,
 // siguiendo el protocolo que espera Decap CMS para el backend "github".
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const code = event.queryStringParameters && event.queryStringParameters.code;
   const clientId = process.env.OAUTH_CLIENT_ID;
   const clientSecret = process.env.OAUTH_CLIENT_SECRET;
