@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const noticiasModules = import.meta.glob('../data/noticias-items/*.json', { eager: true });
+const noticias = Object.values(noticiasModules).map((m) => m.default);
+
+const ordenadas = [...noticias].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+const formatoFecha = (f) => new Date(f).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+<BaseLayout title="Inicio">
+  <section class="section" style="background:var(--navy);">
+    <div class="container" style="padding:2.5rem 24px; color:#fff;">
+      <p style="font-family:var(--font-display); font-weight:900; font-size:1.6rem; margin:0 0 8px;">Medicina Intensiva de Madrid</p>
+      <p style="max-width:480px; color:#cdd8e2; margin:0 0 20px;">Recursos, formación y herramientas clínicas para profesionales del paciente crítico.</p>
+      <a href="/hazte-socio" class="btn">Hazte socio</a>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Últimas noticias</h2>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        {ordenadas.map(n => (
+          <a href={n.enlace} class="card" style="text-decoration:none; color:inherit; display:block;">
+            <p style="font-size:0.8rem; color:var(--text-secondary); margin:0 0 4px;">{formatoFecha(n.fecha)}</p>
+            <h3 style="margin:0 0 4px;">{n.titulo}</h3>
+            <p style="margin:0; color:var(--text-secondary);">{n.texto}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-alt">
+    <div class="container">
+      <h2>Herramientas clínicas</h2>
+      <p style="color:var(--text-secondary); margin-top:-8px;">Las más consultadas de todo el sitio.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="badge" href="/herramientas#apache2">APACHE II</a>
+        <a class="badge" href="/herramientas#sofa">SOFA</a>
+        <a class="badge" href="/herramientas#saps2">SAPS II</a>
+        <a class="badge" href="/herramientas#saps3">SAPS III</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
