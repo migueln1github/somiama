@@ -1,6 +1,6 @@
 // Paso 1 del login del panel /admin: redirige a GitHub para que el
 // webmaster autorice el acceso al repositorio.
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const clientId = process.env.OAUTH_CLIENT_ID;
   const siteUrl = process.env.URL; // Netlify la define sola en producción
   const redirectUri = `${siteUrl}/callback`;
