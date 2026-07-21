@@ -1,0 +1,48 @@
+backend:
+  name: github
+  repo: REEMPLAZAR/CON-tu-usuario-y-repo   # ej. mgonzalezg/somiama-web
+  branch: main
+  base_url: https://REEMPLAZAR-CON-tu-sitio.netlify.app
+
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+
+collections:
+  - name: "noticias"
+    label: "Noticias"
+    folder: "src/data/noticias-items"
+    create: true
+    format: json
+    slug: "{{fields.fecha}}-{{slug}}"
+    fields:
+      - { name: "fecha", label: "Fecha", widget: "datetime", format: "YYYY-MM-DD" }
+      - { name: "titulo", label: "Título", widget: "string" }
+      - { name: "texto", label: "Texto breve", widget: "text" }
+      - { name: "enlace", label: "Enlace (opcional)", widget: "string", required: false }
+
+  - name: "ofertas"
+    label: "Ofertas de trabajo"
+    folder: "src/data/ofertas-items"
+    create: true
+    format: json
+    slug: "{{fields.fecha}}-{{slug}}"
+    fields:
+      - { name: "fecha", label: "Fecha de publicación", widget: "datetime", format: "YYYY-MM-DD" }
+      - { name: "puesto", label: "Puesto", widget: "string" }
+      - { name: "institucion", label: "Institución", widget: "string" }
+      - { name: "descripcion", label: "Descripción", widget: "text" }
+      - { name: "contacto", label: "Email de contacto", widget: "string" }
+
+  - name: "servicios_uci"
+    label: "Mapa: Servicios de Medicina Intensiva"
+    folder: "src/data/servicios-items"
+    create: true
+    format: json
+    slug: "{{slug}}"
+    fields:
+      - { name: "nombre", label: "Nombre del hospital/servicio", widget: "string" }
+      - { name: "tipo", label: "Tipo", widget: "select", options: ["Público", "Privado", "Privado-concertado"] }
+      - { name: "direccion", label: "Dirección", widget: "string" }
+      - { name: "descripcion", label: "Descripción breve", widget: "text" }
+      - { name: "lat", label: "Latitud", widget: "number", value_type: "float", hint: "Busca la dirección en Google Maps, clic derecho sobre el punto y copia el primer número" }
+      - { name: "lng", label: "Longitud", widget: "number", value_type: "float", hint: "El segundo número de las coordenadas de Google Maps" }

@@ -1,0 +1,40 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const serviciosModules = import.meta.glob('../data/servicios-items/*.json', { eager: true });
+const servicios = Object.values(serviciosModules)
+  .map((m) => m.default)
+  .filter((s) => typeof s.lat === 'number' && typeof s.lng === 'number');
+---
+<BaseLayout title="Mapa de servicios">
+  <section class="section">
+    <div class="container">
+      <h1>Servicios de Medicina Intensiva de Madrid</h1>
+      <p style="color:var(--text-secondary); max-width:640px;">
+        Localización de los Servicios de Medicina Intensiva en la Comunidad de Madrid.
+        Este listado se actualiza desde el panel de administración.
+      </p>
+      <div id="map" style="height:520px; border-radius:12px; border:1px solid var(--border); margin-top:1rem;"></div>
+      <p style="font-size:0.75rem; color:var(--text-secondary); margin-top:8px;">
+        Mapa © <a href="https://www.openstreetmap.org/copyright">colaboradores de OpenStreetMap</a>
+      </p>
+    </div>
+  </section>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script is:inline src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script define:vars={{ servicios }}>
+    document.addEventListener('DOMContentLoaded', () => {
+      const map = L.map('map').setView([40.4168, -3.7038], 10);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors',
+        maxZoom: 19
+      }).addTo(map);
+
+      for (const s of servicios) {
+        const marker = L.marker([s.lat, s.lng]).addTo(map);
+        marker.bindPopup(`<strong>${s.nombre}</strong><br>${s.tipo}<br>${s.descripcion}`);
+      }
+    });
+  </script>
+</BaseLayout>
