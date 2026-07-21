@@ -1,0 +1,45 @@
+name: Compilar y publicar en la rama deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias y compilar el sitio Astro
+        run: |
+          npm ci
+          npm run build
+
+      - name: Preparar la carpeta de despliegue
+        run: |
+          rm -rf deploy-output
+          mkdir deploy-output
+          cp -r dist deploy-output/dist
+          cp server/server.js deploy-output/server.js
+          cp server/package.json deploy-output/package.json
+
+      - name: Publicar en la rama deploy
+        run: |
+          cd deploy-output
+          git init
+          git checkout -b deploy
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Despliegue automático $(date -u +'%Y-%m-%d %H:%M UTC')"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          git push origin deploy --force
