@@ -32,25 +32,34 @@ async function enviarAviso(asunto, datos) {
   });
 }
 
-function handlerFormulario(asunto) {
-  return async (req, res) => {
-    try {
-      // El campo "bot-field" es un honeypot: si viene relleno, es un bot.
-      if (req.body['bot-field']) {
-        return res.redirect('/gracias');
-      }
-      await enviarAviso(asunto, req.body);
-      res.redirect('/gracias');
-    } catch (err) {
-      console.error('Error enviando formulario:', err);
-      res.status(500).send('Hubo un error enviando el formulario. Inténtalo de nuevo más tarde.');
-    }
-  };
-}
+const ASUNTOS = {
+  contacto: 'Nuevo mensaje de contacto — somiama.org',
+  'hazte-socio': 'Nueva solicitud de alta de socio — somiama.org',
+  'solicitud-aval': 'Nueva solicitud de aval científico — somiama.org',
+};
 
-app.post('/contacto', handlerFormulario('Nuevo mensaje de contacto — somiama.org'));
-app.post('/hazte-socio', handlerFormulario('Nueva solicitud de alta de socio — somiama.org'));
-app.post('/actividades/solicitud-aval', handlerFormulario('Nueva solicitud de aval científico — somiama.org'));
+// Los 3 formularios (ver src/pages/*.astro) llevan action="/gracias" y un
+// campo oculto "form-name" — mismo patrón que usa Netlify Forms. Aquí
+// replicamos ese comportamiento: identificamos qué formulario es por ese
+// campo, enviamos el email, y servimos la propia página de agradecimiento
+// ya compilada como respuesta.
+app.post('/gracias', async (req, res) => {
+  try {
+    const nombreFormulario = req.body['form-name'];
+    const asunto = ASUNTOS[nombreFormulario] || 'Nuevo mensaje desde somiama.org';
+
+    // El campo "bot-field" es un honeypot: si viene relleno, es un bot —
+    // no enviamos el email, pero mostramos igualmente la página de gracias.
+    if (!req.body['bot-field']) {
+      await enviarAviso(asunto, req.body);
+    }
+
+    res.sendFile(path.join(__dirname, 'dist', 'gracias', 'index.html'));
+  } catch (err) {
+    console.error('Error enviando formulario:', err);
+    res.status(500).send('Hubo un error enviando el formulario. Inténtalo de nuevo más tarde.');
+  }
+});
 
 // ---------- OAuth de GitHub para el panel /admin (Decap CMS) ----------
 app.get('/auth', (req, res) => {
@@ -112,6 +121,11 @@ app.get('/callback', async (req, res) => {
 // gestione sus propias páginas 404 si existieran, si no, mensaje simple.
 app.use((req, res) => {
   res.status(404).send('Página no encontrada');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor SOMIAMA escuchando en el puerto ${PORT}`);
 });
 
 const PORT = process.env.PORT || 3000;
