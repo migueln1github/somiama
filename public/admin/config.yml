@@ -2,7 +2,7 @@ backend:
   name: github
   repo: migueln1github/somiama   # ej. mgonzalezg/somiama-web
   branch: main
-  base_url: http://pruebas.somiama.org
+  base_url: https://pruebas.somiama.org
 
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
