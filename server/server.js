@@ -147,4 +147,3 @@ app.listen(PORT, () => {
   console.log(`Servidor SOMIAMA escuchando en el puerto ${PORT}`);
 });
 Listo
-Pasos
