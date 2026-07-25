@@ -1,6 +1,6 @@
 backend:
   name: github
-  repo: REEMPLAZAR/CON-tu-usuario-y-repo   # ej. mgonzalezg/somiama-web
+  repo: migueln1github/somiama   # ej. mgonzalezg/somiama-web
   branch: main
   base_url: base_url: http://pruebas.somiama.org
 
