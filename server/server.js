@@ -38,18 +38,11 @@ const ASUNTOS = {
   'solicitud-aval': 'Nueva solicitud de aval científico — somiama.org',
 };
 
-// Los 3 formularios (ver src/pages/*.astro) llevan action="/gracias" y un
-// campo oculto "form-name" — mismo patrón que usa Netlify Forms. Aquí
-// replicamos ese comportamiento: identificamos qué formulario es por ese
-// campo, enviamos el email, y servimos la propia página de agradecimiento
-// ya compilada como respuesta.
 app.post('/gracias', async (req, res) => {
   try {
     const nombreFormulario = req.body['form-name'];
     const asunto = ASUNTOS[nombreFormulario] || 'Nuevo mensaje desde somiama.org';
 
-    // El campo "bot-field" es un honeypot: si viene relleno, es un bot —
-    // no enviamos el email, pero mostramos igualmente la página de gracias.
     if (!req.body['bot-field']) {
       await enviarAviso(asunto, req.body);
     }
@@ -61,7 +54,6 @@ app.post('/gracias', async (req, res) => {
   }
 });
 
-// ---------- OAuth de GitHub para el panel /admin (Decap CMS) ----------
 app.get('/auth', (req, res) => {
   const clientId = process.env.OAUTH_CLIENT_ID;
   const redirectUri = `${process.env.SITE_URL}/callback`;
@@ -97,37 +89,21 @@ app.get('/callback', async (req, res) => {
 
   const payload = JSON.stringify({ token: data.access_token, provider: 'github' });
 
-  // VERSIÓN DE DIAGNÓSTICO: en vez de cerrarse sola, esta ventana se queda
-  // abierta y va escribiendo en pantalla cada paso del protocolo, para ver
-  // exactamente dónde se corta la comunicación con /admin.
   const html = `
-    <html><body style="font-family: monospace; padding: 20px; font-size: 14px;">
-    <h3>Diagnóstico del login de /admin</h3>
-    <div id="log"></div>
+    <html><body>
     <script>
-      const log = (msg) => {
-        document.getElementById('log').innerHTML += '<p>' + new Date().toLocaleTimeString() + ' — ' + msg + '</p>';
-      };
-
-      log('window.opener existe: ' + (window.opener ? 'SÍ' : 'NO (aquí estaría el problema)'));
-
-      if (window.opener) {
+      (function() {
         function receiveMessage(e) {
-          log('Mensaje RECIBIDO desde /admin: "' + e.data + '" (origen: ' + e.origin + ')');
-          log('Enviando el token de vuelta a /admin...');
           window.opener.postMessage(
             'authorization:github:success:${payload}',
             e.origin
           );
-          log('Token enviado. Si /admin no reacciona en unos segundos, el problema está en cómo Decap CMS procesa este mensaje.');
           window.removeEventListener('message', receiveMessage, false);
+          window.close();
         }
         window.addEventListener('message', receiveMessage, false);
-        log('Escuchando respuesta de /admin...');
-        log('Enviando primer aviso "authorizing:github" a /admin...');
         window.opener.postMessage('authorizing:github', '*');
-        log('Primer aviso enviado. Esperando que /admin responda...');
-      }
+      })();
     </script>
     </body></html>
   `;
@@ -136,8 +112,6 @@ app.get('/callback', async (req, res) => {
   res.send(html);
 });
 
-// Cualquier ruta no encontrada como archivo estático: dejar que Astro
-// gestione sus propias páginas 404 si existieran, si no, mensaje simple.
 app.use((req, res) => {
   res.status(404).send('Página no encontrada');
 });
