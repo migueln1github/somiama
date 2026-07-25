@@ -146,4 +146,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor SOMIAMA escuchando en el puerto ${PORT}`);
 });
-Listo
