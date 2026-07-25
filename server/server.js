@@ -38,18 +38,11 @@ const ASUNTOS = {
   'solicitud-aval': 'Nueva solicitud de aval científico — somiama.org',
 };
 
-// Los 3 formularios (ver src/pages/*.astro) llevan action="/gracias" y un
-// campo oculto "form-name" — mismo patrón que usa Netlify Forms. Aquí
-// replicamos ese comportamiento: identificamos qué formulario es por ese
-// campo, enviamos el email, y servimos la propia página de agradecimiento
-// ya compilada como respuesta.
 app.post('/gracias', async (req, res) => {
   try {
     const nombreFormulario = req.body['form-name'];
     const asunto = ASUNTOS[nombreFormulario] || 'Nuevo mensaje desde somiama.org';
 
-    // El campo "bot-field" es un honeypot: si viene relleno, es un bot —
-    // no enviamos el email, pero mostramos igualmente la página de gracias.
     if (!req.body['bot-field']) {
       await enviarAviso(asunto, req.body);
     }
@@ -61,7 +54,6 @@ app.post('/gracias', async (req, res) => {
   }
 });
 
-// ---------- OAuth de GitHub para el panel /admin (Decap CMS) ----------
 app.get('/auth', (req, res) => {
   const clientId = process.env.OAUTH_CLIENT_ID;
   const redirectUri = `${process.env.SITE_URL}/callback`;
@@ -117,15 +109,8 @@ app.get('/callback', async (req, res) => {
   `);
 });
 
-// Cualquier ruta no encontrada como archivo estático: dejar que Astro
-// gestione sus propias páginas 404 si existieran, si no, mensaje simple.
 app.use((req, res) => {
   res.status(404).send('Página no encontrada');
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor SOMIAMA escuchando en el puerto ${PORT}`);
 });
 
 const PORT = process.env.PORT || 3000;
