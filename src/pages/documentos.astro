@@ -1,38 +1,38 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const documentosModules = import.meta.glob('../data/documentos-items/*.json', { eager: true });
+const documentos = Object.values(documentosModules).map((m) => m.default);
+const ordenados = [...documentos].sort((a, b) => new Date(b.fecha || 0) - new Date(a.fecha || 0));
 ---
 <BaseLayout title="Documentos">
   <section class="section">
     <div class="container">
       <h1>Documentos</h1>
       <p style="color:var(--text-secondary);">
-        Estatutos, libros de abstracts de congresos anteriores y otros documentos de la Sociedad.
+        Estatutos, libros de abstracts de congresos anteriores y otros documentos de la Sociedad,
+        alojados directamente en este sitio.
       </p>
-      <div class="card">
-        <p>Todos los documentos se alojan en un repositorio externo para mantener el sitio ligero.</p>
-        <a class="btn" href="https://drive.google.com/REEMPLAZAR-CON-ENLACE-REAL" target="_blank">Ir al repositorio de documentos</a>
-      </div>
-      <div class="card" style="margin-top:12px;">
-        <h3 style="margin-top:0;">Documentos disponibles en el sitio anterior</h3>
-        <p style="color:var(--text-secondary); font-size:14px; margin-bottom:8px;">
-          Pendientes de subir al repositorio externo de arriba:
-        </p>
-        <ul style="color:var(--text-secondary); font-size:14px; padding-left:1.2rem; margin:0;">
-          <li>Estatutos de SOMIAMA</li>
-          <li>Libro de Abstracts — XXX Reunión SOMIAMA 2025</li>
-          <li>Libro de Abstracts — XXIX Reunión SOMIAMA 2024</li>
-          <li>Libro de Abstracts — SOMIAMA 2023</li>
-          <li>Libro de Abstracts — SOMIAMA 2022</li>
-          <li>Libro de Abstracts — SOMIAMA 2021</li>
-          <li>Libro de Abstracts — SOMIAMA 2020</li>
-          <li>Libro de Abstracts — XXIV Reunión SOMIAMA 2019</li>
-          <li>Libro de Abstracts — SOMIAMA 2018</li>
-        </ul>
-      </div>
-      <div class="card" id="covid19" style="margin-top:12px;">
-        <h3>Protocolo COVID-19</h3>
-        <p>Documento de consulta.</p>
-        <a class="btn-outline" href="/documentos/protocolo-covid19.pdf" target="_blank">Descargar PDF</a>
+
+      {ordenados.length === 0 && (
+        <div class="card">
+          <p style="color:var(--text-secondary); margin:0;">
+            Todavía no hay documentos publicados. Se añaden desde el panel de administración (<code>/admin</code>),
+            sección "Documentos".
+          </p>
+        </div>
+      )}
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        {ordenados.map(doc => (
+          <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+            <div>
+              <h3 style="margin:0 0 4px;">{doc.titulo}</h3>
+              {doc.descripcion && <p style="margin:0; color:var(--text-secondary); font-size:14px;">{doc.descripcion}</p>}
+            </div>
+            <a class="btn" href={doc.archivo} target="_blank">Descargar</a>
+          </div>
+        ))}
       </div>
     </div>
   </section>
