@@ -5,23 +5,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <section class="section">
     <div class="container">
       <h1>Hazte socio de SOMIAMA</h1>
-      <p style="max-width:600px; color:var(--text-secondary);">
+      <p style="color:var(--text-secondary);">
+        Si eres profesional de la Medicina Intensiva, únete a la Sociedad. Rellena tus datos y
+        nos pondremos en contacto contigo para completar el alta.
+      </p>
+      <p style="color:var(--text-secondary);">
         Ser socio de SOMIAMA significa pertenecer a la Sociedad científica de Medicina Intensiva
         de la Comunidad de Madrid. Da igual que seas médico, residente o profesional de
         enfermería: si tu interés son los Cuidados Intensivos, esta es tu Sociedad.
       </p>
-      <p style="max-width:600px; color:var(--text-secondary);">
+      <p style="color:var(--text-secondary);">
         Asociarte nos ayuda a estar representados como especialidad ante los diferentes ámbitos
         oficiales que nos afectan (Consejería de Sanidad, Colegio de Médicos, etc.). La cuota
         anual (30 € en la actualidad) incluye la posibilidad de asistir de forma gratuita a las
         Jornadas Anuales de la Sociedad (acreditadas), así como participar en condiciones
         preferentes en actividades organizadas o avaladas por SOMIAMA.
       </p>
-      <p style="max-width:600px; color:var(--text-secondary); font-size:14px;">
+      <p style="color:var(--text-secondary); font-size:14px;">
         Rellena el siguiente formulario (todos los datos son obligatorios) y nos pondremos en
         contacto contigo para completar el alta.
       </p>
-      <div class="card" style="max-width:480px;">
+      <div class="card">
         <form name="hazte-socio" method="POST" action="/gracias" data-netlify="true" data-netlify-honeypot="bot-field">
           <input type="hidden" name="form-name" value="hazte-socio" />
           <p style="display:none;"><label>No rellenar: <input name="bot-field" /></label></p>
