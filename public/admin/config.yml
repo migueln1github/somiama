@@ -1,12 +1,10 @@
 backend:
   name: github
-  repo: migueln1github/somiama   # ej. mgonzalezg/somiama-web
+  repo: migueln1github/somiama
   branch: main
   base_url: https://pruebas.somiama.org
-
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
-
 collections:
   - name: "noticias"
     label: "Noticias"
@@ -19,7 +17,6 @@ collections:
       - { name: "titulo", label: "Título", widget: "string" }
       - { name: "texto", label: "Texto breve", widget: "text" }
       - { name: "enlace", label: "Enlace (opcional)", widget: "string", required: false }
-
   - name: "ofertas"
     label: "Ofertas de trabajo"
     folder: "src/data/ofertas-items"
@@ -32,7 +29,6 @@ collections:
       - { name: "institucion", label: "Institución", widget: "string" }
       - { name: "descripcion", label: "Descripción", widget: "text" }
       - { name: "contacto", label: "Email de contacto", widget: "string" }
-
   - name: "servicios_uci"
     label: "Mapa: Servicios de Medicina Intensiva"
     folder: "src/data/servicios-items"
@@ -46,3 +42,14 @@ collections:
       - { name: "descripcion", label: "Descripción breve", widget: "text" }
       - { name: "lat", label: "Latitud", widget: "number", value_type: "float", hint: "Busca la dirección en Google Maps, clic derecho sobre el punto y copia el primer número" }
       - { name: "lng", label: "Longitud", widget: "number", value_type: "float", hint: "El segundo número de las coordenadas de Google Maps" }
+  - name: "documentos"
+    label: "Documentos"
+    folder: "src/data/documentos-items"
+    create: true
+    format: json
+    slug: "{{fields.titulo}}"
+    fields:
+      - { name: "titulo", label: "Título del documento", widget: "string" }
+      - { name: "descripcion", label: "Descripción breve (opcional)", widget: "string", required: false }
+      - { name: "archivo", label: "Archivo (PDF)", widget: "file", media_folder: "/public/documentos", public_folder: "/documentos", hint: "Sube aquí el PDF — quedará alojado en el propio sitio" }
+      - { name: "fecha", label: "Fecha (opcional, para ordenar)", widget: "datetime", format: "YYYY-MM-DD", required: false }
