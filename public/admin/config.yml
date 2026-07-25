@@ -2,7 +2,7 @@ backend:
   name: github
   repo: REEMPLAZAR/CON-tu-usuario-y-repo   # ej. mgonzalezg/somiama-web
   branch: main
-  base_url: https://REEMPLAZAR-CON-tu-sitio.netlify.app
+  base_url: base_url: http://pruebas.somiama.org
 
 media_folder: "public/images/uploads"
 public_folder: "/images/uploads"
