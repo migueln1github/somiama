@@ -1,6 +1,6 @@
 # somiama-web
 
-Andamiaje del nuevo sitio de SOMIAMA. Astro (sitio estático) + Decap CMS (panel de edición) + Leaflet (mapa) + Clerk (área de socios, pendiente de configurar).
+Sitio de SOMIAMA. Astro (sitio estático) + Decap CMS (panel de edición) + Leaflet (mapa) + Clerk (área de socios) + un pequeño servidor Node/Express propio, alojado en el Plesk de SOMIAMA.
 
 ## Cómo probarlo en local
 
@@ -17,40 +17,50 @@ Abre `http://localhost:4321`.
 
 ```
 src/
-  layouts/BaseLayout.astro    # navegación + footer, comunes a todo el sitio
-  pages/                      # una página por ruta del sitemap acordado
-  data/
-    noticias-items/*.json     # una noticia por archivo (las gestiona Decap CMS)
-    ofertas-items/*.json       # una oferta de trabajo por archivo
-    servicios-items/*.json     # un Servicio de Medicina Intensiva por archivo
+layouts/BaseLayout.astro # navegación + footer, comunes a todo el sitio
+pages/ # una página por ruta del sitemap acordado
+data/
+noticias-items/.json # una noticia por archivo (las gestiona Decap CMS)
+ofertas-items/.json # una oferta de trabajo por archivo
+servicios-items/*.json # un Servicio de Medicina Intensiva por archivo
 public/
-  admin/                      # panel de Decap CMS
-  herramientas/apache2/       # calculadora APACHE II ya modernizada
-```
+admin/ # panel de Decap CMS
+server/
+server.js # servidor Node/Express: sirve el sitio, formularios y login de /admin
+.github/workflows/
+build-and-deploy.yml # compila el sitio en GitHub Actions y lo publica en la rama "deploy"
 
-Las noticias y ofertas se ordenan solas por fecha (más reciente primero) — no hace falta reordenar nada a mano.
+## Cómo editar los textos de la web
+
+Cada página vive en un archivo `.astro` dentro de `src/pages/` (por ejemplo, `src/pages/sociedad.astro` para la página "Sociedad"). Para cambiar un texto:
+
+1. Edita el archivo en GitHub (icono del lápiz)
+2. Cambia el texto que está entre etiquetas como `<p>...</p>` o `<li>...</li>` — no toques lo que hay dentro de `style="..."`, eso es diseño, no contenido
+3. "Commit changes"
+4. Esto dispara la compilación sola en GitHub Actions (pestaña "Actions" del repo)
+5. En Plesk: **Hosting y DNS → Git → Pull ahora**, y luego **Herramientas de desarrollo → Node.js → Reiniciar app**
+
+El orden de las pestañas del menú se controla en `src/layouts/BaseLayout.astro`, en el array `nav` al principio del archivo — basta con reordenar esas líneas.
 
 ## Poner en marcha el panel de administración (Decap CMS)
 
-El panel vive en `/admin`. **Importante**: Netlify descontinuó Identity y Git Gateway en 2025, así que este proyecto usa en su lugar el backend "github" directo de Decap CMS, con una pequeña función (en `netlify/functions/`) que hace de intermediario OAuth — sin depender de ningún servicio adicional, todo alojado gratis en el propio Netlify.
+El panel vive en `/admin`, con el backend "github" directo de Decap CMS: una función propia en `server/server.js` hace de intermediario OAuth con GitHub (rutas `/auth` y `/callback`).
 
-Pasos para activarlo:
+Pasos para activarlo (o para moverlo a un dominio nuevo, como el día del cambio a `somiama.org` definitivo):
 
-1. Sube este proyecto a un repositorio de GitHub y despliega el sitio en Netlify (ver sección "Despliegue" más abajo)
-2. En `public/admin/config.yml`, sustituye:
-   - `repo: REEMPLAZAR/CON-tu-usuario-y-repo` por tu repo real, ej. `mgonzalezg/somiama-web`
-   - `base_url: https://REEMPLAZAR-CON-tu-sitio.netlify.app` por la URL real que te da Netlify
-3. Crea una **OAuth App** de GitHub: github.com → tu foto de perfil → **Settings → Developer settings → OAuth Apps → New OAuth App**
-   - **Homepage URL**: la URL de tu sitio en Netlify
-   - **Authorization callback URL**: `https://tu-sitio.netlify.app/callback`
-   - Al crearla, copia el **Client ID**, y genera y copia un **Client Secret**
-4. En Netlify: **Site configuration → Environment variables**, añade dos variables:
-   - `OAUTH_CLIENT_ID` con el Client ID
-   - `OAUTH_CLIENT_SECRET` con el Client Secret
-5. Vuelve a desplegar (Deploys → Trigger deploy), para que las funciones cojan las variables nuevas
-6. Entra en `tudominio.com/admin` → botón "Login with GitHub" → inicias sesión con tu propia cuenta de GitHub (la misma que ya tiene acceso al repo, así que no hace falta invitar a nadie más)
+1. En `public/admin/config.yml`, ajusta:
+   - `repo:` con tu usuario/repo real de GitHub
+   - `base_url:` con la URL real del sitio (en `https://`, una vez tengáis certificado SSL válido)
+2. Crea una **OAuth App** de GitHub: github.com → tu foto de perfil → **Settings → Developer settings → OAuth Apps → New OAuth App**
+   - **Homepage URL**: la URL real del sitio
+   - **Authorization callback URL**: `https://tudominio.com/callback`
+   - Copia el **Client ID**, y genera y copia un **Client Secret**
+3. En Plesk → **Herramientas de desarrollo → Node.js → Variables de entorno**, añade `OAUTH_CLIENT_ID` y `OAUTH_CLIENT_SECRET`
+4. Reinicia la app Node.js
 
-A partir de ahí, añadir una noticia, oferta o servicio del mapa es rellenar un formulario — cada guardado crea o modifica un archivo `.json` directamente en el repositorio, sin tocar código.
+A partir de ahí, añadir una noticia, oferta o servicio del mapa es rellenar un formulario en `/admin` — cada guardado crea o modifica un archivo `.json` directamente en el repositorio.
+
+**Importante**: `base_url` (en `config.yml`) y la "Authorization callback URL" (en la OAuth App de GitHub) deben coincidir **exactamente** con el protocolo real del sitio — `http://` o `https://` según corresponda. Un desajuste entre los dos hace que el login se quede colgado sin avisar del motivo.
 
 ## El mapa de servicios
 
@@ -58,70 +68,47 @@ Usa **Leaflet + OpenStreetMap** (gratuito, sin API key ni tarjeta de crédito, a
 
 Para añadir un servicio nuevo desde el panel: busca la dirección en Google Maps, clic derecho sobre el punto exacto → copia las coordenadas → pégalas en los campos "Latitud" y "Longitud" del formulario.
 
-**Importante**: las coordenadas de los 17 servicios ya cargados son aproximadas (calculadas por mí a partir de la dirección conocida de cada hospital, sin verificación en mapa real). Antes de publicar, conviene comprobar cada una en Google Maps — son fáciles de ajustar desde el propio panel.
+**Importante**: las coordenadas de los servicios públicos ya cargados son aproximadas (calculadas a partir de la dirección conocida de cada hospital, sin verificación en mapa real). Conviene comprobar cada una en Google Maps — son fáciles de ajustar desde el propio panel. Los hospitales privados siguen pendientes de añadir.
 
-## Área de socios (Clerk) — integrado, falta tu clave
+## Área de socios (Clerk)
 
-La página `/area-socios` ya usa el SDK de [Clerk](https://clerk.com) de verdad (login + perfil + cambio de contraseña autogestionado). Solo falta que pongas tu clave:
+La página `/area-socios` usa el SDK de [Clerk](https://clerk.com): login, registro y gestión de perfil/contraseña, a través de las páginas alojadas por el propio Clerk ("Account Portal") — sin componentes propios de login que puedan romperse con futuras actualizaciones de Clerk.
 
-1. Crea una cuenta gratuita en [clerk.com](https://clerk.com) (hasta ~10.000 usuarios sin coste)
-2. Dentro, crea una "aplicación" y ve a **API Keys** → copia la **Publishable key** (empieza por `pk_test_...` o `pk_live_...`). Esta clave es pública, no pasa nada si se ve en el navegador.
-3. En tu ordenador: copia `.env.example` como `.env` (sin `.example`) y pega tu clave ahí:
-   ```
-   PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_tu_clave_real
-   ```
-4. En Netlify (para que funcione también en producción, no solo en local): **Site settings → Environment variables → Add a variable**, con el mismo nombre y valor, y vuelve a desplegar.
+Configuración:
+1. Cuenta en [clerk.com](https://clerk.com) (gratis hasta ~10.000 usuarios), crea una aplicación, copia la **Publishable key** en **API Keys**
+2. En Plesk → Node.js → Variables de entorno, añade `PUBLIC_CLERK_PUBLISHABLE_KEY` con esa clave (es pública, no pasa nada si se ve en el navegador)
+3. **Importante**: esta variable se usa **al compilar** el sitio (`npm run build`), no al ejecutarlo — como la compilación la hace GitHub Actions, la clave debe estar también como **secreto del repositorio** en GitHub (Settings → Secrets and variables → Actions → `PUBLIC_CLERK_PUBLISHABLE_KEY`), y el workflow (`.github/workflows/build-and-deploy.yml`) ya está preparado para leerla de ahí
+4. En el panel de Clerk, autoriza el dominio real donde vive el sitio (Configure → Domains)
 
-**Cómo funciona ahora mismo**: en vez de intentar mostrar el formulario de login dentro de nuestra propia página (lo que dependía de un componente de Clerk que resultó frágil), la página enlaza directamente a las páginas de login y gestión de cuenta que aloja el propio Clerk ("Account Portal") — mismo resultado para el socio, pero sin ningún componente nuestro que pueda romperse con futuras actualizaciones de Clerk. Si no hay clave configurada, muestra un aviso en vez de romperse.
+**Aviso de seguridad**: esta integración protege el contenido *en el navegador* (oculta la sección hasta comprobar que hay sesión), pero el HTML de esa página se genera igual para todo el mundo — no es una barrera a nivel de servidor. Suficiente para ocultar actas/documentos internos de poco valor sensible a curiosos casuales; si en el futuro se sube algo realmente sensible, habría que verificar la sesión también en `server/server.js` antes de servir ese contenido.
 
-**Aviso importante de seguridad**: esta integración protege el contenido *en el navegador* (oculta la sección hasta comprobar que hay sesión), pero como el sitio es 100% estático, el HTML de esa página se genera igual para todo el mundo — no es una barrera a nivel de servidor. Para el uso previsto (ocultar actas/documentos internos de poco valor sensible a curiosos casuales) es suficiente y es el mismo compromiso que asumen la mayoría de sitios pequeños con Clerk sin backend propio. Si en el futuro se sube ahí algo realmente sensible, habría que añadir un adaptador de servidor (Netlify Functions) para verificar la sesión antes de servir el contenido — decidme si llegáis a ese punto y lo evaluamos.
+## Formularios (contacto, hazte socio, solicitud de aval)
 
-## Formularios (contacto, hazte socio, solicitud de aval) — conectados con Netlify Forms
+Los 3 formularios los procesa `server/server.js`: identifica cuál es por un campo oculto `form-name` (mismo patrón que usa Netlify Forms, por si algún día se quisiera volver a esa plataforma), envía un email por SMTP, y sirve la página `/gracias` como respuesta.
 
-Los 3 formularios ya están conectados usando **Netlify Forms** — no hace falta ninguna cuenta ni servicio adicional, solo que el sitio esté desplegado en Netlify (que ya es la plataforma recomendada para todo lo demás). Netlify detecta los formularios automáticamente en el primer despliegue, sin configuración.
+Variables de entorno necesarias (Plesk → Node.js → Variables de entorno), con los datos de vuestro buzón de correo (pestaña **Correo** de Plesk):
+- `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` (`true` si el puerto es 465), `SMTP_USER`, `SMTP_PASS`
+- `CONTACT_EMAIL` — a qué dirección llegan los avisos (ej. `info@somiama.org`)
 
-**Para recibir un aviso por email cada vez que alguien envía uno:**
-1. En el panel de Netlify de tu sitio: **Site configuration → Forms → Form notifications**
-2. **Add notification → Email notification**
-3. Pon el email donde quieras recibirlos (ej. `info@somiama.org`) y elige "All form submissions" (o selecciona formulario por formulario si prefieres emails distintos para contacto / hazte socio / solicitud de aval)
+Llevan un campo oculto "honeypot" anti-spam (invisible para personas, pero que atrapa a los bots).
 
-Todos los envíos, aunque no actives el email, quedan igualmente guardados y consultables en **Site configuration → Forms** dentro del propio panel de Netlify.
-
-El plan gratuito de Netlify incluye 100 envíos al mes — más que de sobra para el volumen de esta web. Cada formulario redirige a `/gracias` tras enviarse, y llevan un campo oculto "honeypot" anti-spam (invisible para personas, pero que atrapa a los bots).
-
-## Las 4 herramientas clínicas — completas
+## Las 4 herramientas clínicas
 
 - `/herramientas/apache2`, `/sofa`, `/saps2`, `/saps3` — las 4 modernizadas con su lógica de puntuación completa. SAPS III usa la ecuación general/global de mortalidad (no las variantes regionales específicas).
 
-## Despliegue
-
-Cualquier proveedor de hosting estático sirve (Netlify, Vercel, Cloudflare Pages). Recomiendo Netlify por la integración directa con Decap CMS descrita arriba.
-
-```
-npm run build
-```
-
-Genera el sitio final en `dist/`, listo para subir.
-
-## Alternativa: autoalojar todo en vuestro propio Plesk (sin Netlify)
-
-Si vuestro hosting tiene **Node.js**, **Git**, y **PHP** disponibles (confirmado en el panel de SOMIAMA), podéis alojar todo vosotros mismos, sin depender de Netlify ni de su política de precios.
+## Despliegue (autoalojado en Plesk)
 
 ### Cómo funciona
-- `.github/workflows/build-and-deploy.yml` compila el sitio automáticamente en GitHub (gratis, vía GitHub Actions) cada vez que hay un cambio en `main` — incluidos los cambios que se hacen desde `/admin` — y publica el resultado ya compilado en una rama `deploy`.
-- `server/server.js` es un pequeño servidor Node/Express que sirve el sitio, procesa los 3 formularios (email por SMTP), y hace de intermediario OAuth para el panel `/admin` — el equivalente exacto a lo que hacían las funciones de Netlify.
-- Vuestro Plesk, con su extensión **Git**, se conecta a la rama `deploy` y se actualiza solo.
+- `.github/workflows/build-and-deploy.yml` compila el sitio automáticamente en GitHub (gratis, vía GitHub Actions) cada vez que hay un cambio en `main` — incluidos los cambios hechos desde `/admin` — y publica el resultado ya compilado en una rama `deploy`.
+- `server/server.js` es un servidor Node/Express que sirve el sitio, procesa los 3 formularios, y hace de intermediario OAuth para `/admin`.
+- Plesk, con su extensión **Git**, se conecta a la rama `deploy` y se actualiza solo.
 
 ### Configuración en Plesk
-1. **Hosting y DNS → Git**: conecta el repositorio, apunta a la rama `deploy` (no `main`)
+1. **Hosting y DNS → Git**: conecta el repositorio (`https://github.com/tu-usuario/tu-repo.git`), rama **`deploy`** (no `main`)
 2. **Herramientas de desarrollo → Node.js**: activa Node.js para el dominio, con `server.js` como archivo de arranque
-3. En la configuración de Node.js, añade estas **variables de entorno**:
-   - `OAUTH_CLIENT_ID` y `OAUTH_CLIENT_SECRET` (de tu OAuth App de GitHub — recuerda actualizar la "Authorization callback URL" a `https://tudominio.com/callback`)
-   - `SITE_URL` = `https://tudominio.com`
-   - `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS` (de vuestro buzón de correo, en la pestaña **Correo** de Plesk)
-   - `CONTACT_EMAIL` = `info@somiama.org`
-4. Actualiza `base_url` en `public/admin/config.yml` a vuestro dominio real
-5. Reinicia la app Node.js desde Plesk tras cualquier cambio de variables
+3. Variables de entorno (ver secciones de arriba): `OAUTH_CLIENT_ID`, `OAUTH_CLIENT_SECRET`, `SITE_URL`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `CONTACT_EMAIL`
+4. Pulsa **"Instalación de NPM"** dentro del panel de Node.js (no la acción de despliegue de Git, que no encuentra `npm`)
+5. Reinicia la app tras cualquier cambio de variables
 
-### Qué NO cambia
-El código de las páginas, las 4 herramientas clínicas, y las colecciones de `/admin` son exactamente los mismos — esta alternativa solo cambia **dónde y cómo se sirve** el sitio, no lo que hace.
+### El día del cambio de dominio (de `pruebas.somiama.org` a `somiama.org` definitivo)
+Hay que repetir, con el dominio nuevo: emitir certificado SSL, actualizar `base_url` en `config.yml`, `SITE_URL`, y la "Authorization callback URL" de la OAuth App de GitHub. Son los mismos pasos ya probados en el subdominio de pruebas.
