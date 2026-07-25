@@ -6,6 +6,17 @@
   <title>Administración — SOMIAMA</title>
 </head>
 <body>
+  <div id="diagnostico" style="font-family: monospace; padding: 12px; background: #fff3cd; display: none;"></div>
+  <script>
+    // DIAGNÓSTICO TEMPORAL: para comprobar si esta pestaña recibe de verdad
+    // los mensajes que envía la ventana de /callback durante el login.
+    const diagEl = document.getElementById('diagnostico');
+    window.addEventListener('message', function (e) {
+      diagEl.style.display = 'block';
+      diagEl.innerHTML += '<p>' + new Date().toLocaleTimeString() +
+        ' — Esta pestaña (/admin) recibió: "' + e.data + '" (origen: ' + e.origin + ')</p>';
+    });
+  </script>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 </body>
 </html>
