@@ -30,6 +30,8 @@ server.js # servidor Node/Express: sirve el sitio, formularios y login de /admin
 .github/workflows/
 build-and-deploy.yml # compila el sitio en GitHub Actions y lo publica en la rama "deploy"
 
+```
+
 ## Cómo editar los textos de la web
 
 Cada página vive en un archivo `.astro` dentro de `src/pages/` (por ejemplo, `src/pages/sociedad.astro` para la página "Sociedad"). Para cambiar un texto:
