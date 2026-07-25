@@ -10,8 +10,7 @@ const ordenados = [...documentos].sort((a, b) => new Date(b.fecha || 0) - new Da
     <div class="container">
       <h1>Documentos</h1>
       <p style="color:var(--text-secondary);">
-        Estatutos, libros de abstracts de congresos anteriores y otros documentos de la Sociedad,
-        alojados directamente en este sitio.
+        Documentos (Libros de Abstracts de  los Congresos anuales y otros documentos de interés de acceso público), accesibles para su descarga desde aquí
       </p>
 
       {ordenados.length === 0 && (
