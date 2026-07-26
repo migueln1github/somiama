@@ -58,7 +58,7 @@ collections:
     folder: "src/data/galeria-items"
     create: true
     format: json
-    slug: "{{fields.titulo}}"
+    slug: "foto-{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
     fields:
       - { name: "titulo", label: "Título / pie de foto (opcional)", widget: "string", required: false }
       - { name: "imagen", label: "Foto", widget: "image", media_folder: "/public/images/galeria", public_folder: "/images/galeria", hint: "Fotos de reuniones, congresos, etc. Se muestran rotando en la portada" }
