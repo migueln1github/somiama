@@ -12,13 +12,7 @@ const galeria = Object.values(galeriaModules)
   .sort((a, b) => (a.orden ?? 999) - (b.orden ?? 999));
 ---
 <BaseLayout title="Inicio">
-  <section class="section" style="background:var(--navy); position:relative; overflow:hidden;">
-    <img
-      src="/images/logo-icon.png"
-      alt=""
-      aria-hidden="true"
-      style="position:absolute; right:5%; top:50%; transform:translateY(-50%); width:280px; height:280px; opacity:0.10; pointer-events:none;"
-    />
+  <section class="hero-somiama section" style="position:relative; overflow:hidden;">
     <div class="container" style="padding:2.5rem 24px; color:#fff; position:relative;">
       <img
         src="/images/logo-somiama-blanco.png"
@@ -100,3 +94,24 @@ const galeria = Object.values(galeriaModules)
     }, 5000);
   }
 </script>
+
+<style>
+  .hero-somiama {
+    background-color: var(--navy);
+    background-image: url('/images/logo-icon.png');
+    background-repeat: repeat;
+    background-size: 120px 120px;
+    background-position: center;
+  }
+  .hero-somiama::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--navy);
+    opacity: 0.86;
+  }
+  .hero-somiama .container {
+    position: relative;
+    z-index: 1;
+  }
+</style>
