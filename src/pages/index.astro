@@ -1,17 +1,60 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
 const noticiasModules = import.meta.glob('../data/noticias-items/*.json', { eager: true });
 const noticias = Object.values(noticiasModules).map((m) => m.default);
 const ordenadas = [...noticias].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 const formatoFecha = (f) => new Date(f).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+const galeriaModules = import.meta.glob('../data/galeria-items/*.json', { eager: true });
+const galeria = Object.values(galeriaModules)
+  .map((m) => m.default)
+  .sort((a, b) => (a.orden ?? 999) - (b.orden ?? 999));
 ---
 <BaseLayout title="Inicio">
-  <section class="section" style="background:var(--navy);">
-    <div class="container" style="padding:2.5rem 24px; color:#fff;">
-      <p style="font-family:var(--font-display); font-weight:900; font-size:1.6rem; margin:0 0 8px;">Sociedad de Medicina Intensiva de la Comunidad de Madrid</p>
+  <section class="section" style="background:var(--navy); position:relative; overflow:hidden;">
+    <img
+      src="/images/logo-icon.png"
+      alt=""
+      aria-hidden="true"
+      style="position:absolute; right:-60px; top:50%; transform:translateY(-50%); width:340px; height:340px; opacity:0.08; pointer-events:none;"
+    />
+    <div class="container" style="padding:2.5rem 24px; color:#fff; position:relative;">
+      <img
+        src="/images/logo-somiama.jpg"
+        alt="SOMIAMA — Sociedad de Medicina Intensiva de Madrid"
+        style="height:56px; width:auto; margin-bottom:18px; display:block;"
+      />
+      <p style="font-family:var(--font-display); font-weight:900; font-size:1.6rem; margin:0 0 8px;">Medicina Intensiva de Madrid</p>
       <p style="color:#cdd8e2; margin:0 0 20px;">Recursos, formación y herramientas clínicas para profesionales del paciente crítico.</p>
     </div>
   </section>
+
+  {galeria.length > 0 && (
+    <section class="section" style="padding-top:0; padding-bottom:0;">
+      <div class="container" style="padding-top:1.5rem; padding-bottom:0;">
+        <div id="galeria-home" style="position:relative; width:100%; aspect-ratio:16/6; border-radius:12px; overflow:hidden; background:var(--surface);">
+          {galeria.map((foto, i) => (
+            <img
+              src={foto.imagen}
+              alt={foto.titulo || ''}
+              class="galeria-slide"
+              data-index={i}
+              style={`position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:${i === 0 ? 1 : 0}; transition:opacity 1.2s ease;`}
+            />
+          ))}
+          {galeria.length > 1 && (
+            <div style="position:absolute; bottom:12px; left:0; right:0; display:flex; justify-content:center; gap:6px;">
+              {galeria.map((_, i) => (
+                <span class="galeria-dot" data-dot={i} style={`width:8px; height:8px; border-radius:50%; background:#fff; opacity:${i === 0 ? 0.9 : 0.4}; transition:opacity 0.3s;`}></span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
+
   <section class="section">
     <div class="container">
       <h2>Últimas noticias</h2>
@@ -26,6 +69,7 @@ const formatoFecha = (f) => new Date(f).toLocaleDateString('es-ES', { day: 'nume
       </div>
     </div>
   </section>
+
   <section class="section section-alt">
     <div class="container">
       <h2>Herramientas clínicas</h2>
@@ -39,3 +83,20 @@ const formatoFecha = (f) => new Date(f).toLocaleDateString('es-ES', { day: 'nume
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  // Carrusel simple de la galería de la home: rota sola cada 5 segundos,
+  // sin ninguna librería externa.
+  const slides = document.querySelectorAll('.galeria-slide');
+  const dots = document.querySelectorAll('.galeria-dot');
+  if (slides.length > 1) {
+    let actual = 0;
+    setInterval(() => {
+      slides[actual].style.opacity = '0';
+      if (dots[actual]) dots[actual].style.opacity = '0.4';
+      actual = (actual + 1) % slides.length;
+      slides[actual].style.opacity = '1';
+      if (dots[actual]) dots[actual].style.opacity = '0.9';
+    }, 5000);
+  }
+</script>
