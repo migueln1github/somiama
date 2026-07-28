@@ -1,0 +1,65 @@
+backend:
+  name: github
+  repo: migueln1github/somiama
+  branch: main
+  base_url: https://pruebas.somiama.org
+media_folder: "public/images/uploads"
+public_folder: "/images/uploads"
+collections:
+  - name: "noticias"
+    label: "Noticias"
+    folder: "src/data/noticias-items"
+    create: true
+    format: json
+    slug: "{{fields.fecha}}-{{slug}}"
+    fields:
+      - { name: "fecha", label: "Fecha", widget: "datetime", format: "YYYY-MM-DD" }
+      - { name: "titulo", label: "Título", widget: "string" }
+      - { name: "texto", label: "Texto breve", widget: "text" }
+      - { name: "enlace", label: "Enlace (opcional)", widget: "string", required: false }
+  - name: "ofertas"
+    label: "Ofertas de trabajo"
+    folder: "src/data/ofertas-items"
+    create: true
+    format: json
+    slug: "{{fields.fecha}}-{{slug}}"
+    fields:
+      - { name: "fecha", label: "Fecha de publicación", widget: "datetime", format: "YYYY-MM-DD" }
+      - { name: "puesto", label: "Puesto", widget: "string" }
+      - { name: "institucion", label: "Institución", widget: "string" }
+      - { name: "descripcion", label: "Descripción", widget: "text" }
+      - { name: "contacto", label: "Email de contacto", widget: "string" }
+  - name: "servicios_uci"
+    label: "Mapa: Servicios de Medicina Intensiva"
+    folder: "src/data/servicios-items"
+    create: true
+    format: json
+    slug: "{{slug}}"
+    fields:
+      - { name: "nombre", label: "Nombre del hospital/servicio", widget: "string" }
+      - { name: "tipo", label: "Tipo", widget: "select", options: ["Público", "Privado", "Privado-concertado"] }
+      - { name: "direccion", label: "Dirección", widget: "string" }
+      - { name: "descripcion", label: "Descripción breve", widget: "text" }
+      - { name: "lat", label: "Latitud", widget: "number", value_type: "float", hint: "Busca la dirección en Google Maps, clic derecho sobre el punto y copia el primer número" }
+      - { name: "lng", label: "Longitud", widget: "number", value_type: "float", hint: "El segundo número de las coordenadas de Google Maps" }
+  - name: "documentos"
+    label: "Documentos"
+    folder: "src/data/documentos-items"
+    create: true
+    format: json
+    slug: "{{fields.titulo}}"
+    fields:
+      - { name: "titulo", label: "Título del documento", widget: "string" }
+      - { name: "descripcion", label: "Descripción breve (opcional)", widget: "string", required: false }
+      - { name: "archivo", label: "Archivo (PDF)", widget: "file", media_folder: "/public/documentos", public_folder: "/documentos", hint: "Sube aquí el PDF — quedará alojado en el propio sitio" }
+      - { name: "fecha", label: "Fecha (opcional, para ordenar)", widget: "datetime", format: "YYYY-MM-DD", required: false }
+  - name: "galeria"
+    label: "Galería (fotos de la home)"
+    folder: "src/data/galeria-items"
+    create: true
+    format: json
+    slug: "foto-{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}"
+    fields:
+      - { name: "titulo", label: "Título / pie de foto (opcional)", widget: "string", required: false }
+      - { name: "imagen", label: "Foto", widget: "image", media_folder: "/public/images/galeria", public_folder: "/images/galeria", hint: "Fotos de reuniones, congresos, etc. Se muestran rotando en la portada" }
+      - { name: "orden", label: "Orden (opcional, número)", widget: "number", required: false, hint: "Si lo dejas vacío, se muestran en el orden en que las subiste" }
