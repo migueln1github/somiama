@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const ofertasModules = import.meta.glob('../../data/ofertas-items/*.json', { eager: true });
+const ofertas = Object.values(ofertasModules).map((m) => m.default);
+const ordenadas = [...ofertas].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+---
+<BaseLayout title="Ofertas de trabajo">
+  <section class="section">
+    <div class="container">
+      <h1>Ofertas de trabajo</h1>
+      <p style="color:var(--text-secondary);">
+        Ofertas de empleo en el ámbito de la Medicina Intensiva, en la Comunidad de Madrid.
+      </p>
+      <a class="btn" href="/ofertas-trabajo/publicar" style="margin-bottom:1.5rem; display:inline-block;">
+        Publicar una oferta
+      </a>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        {ordenadas.map(o => (
+          <div class="card">
+            <h3 style="margin:0 0 4px;">{o.puesto}</h3>
+            <p style="margin:0 0 4px; color:var(--text-secondary);">{o.institucion}</p>
+            <p style="margin:0 0 8px;">{o.descripcion}</p>
+            <a href={`mailto:${o.contacto}`} style="font-size:0.85rem;">{o.contacto}</a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
