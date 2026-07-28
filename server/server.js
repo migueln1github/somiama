@@ -36,6 +36,7 @@ const ASUNTOS = {
   contacto: 'Nuevo mensaje de contacto — somiama.org',
   'hazte-socio': 'Nueva solicitud de alta de socio — somiama.org',
   'solicitud-aval': 'Nueva solicitud de aval científico — somiama.org',
+  'oferta-empleo': 'Nueva oferta de trabajo para revisar — somiama.org',
 };
 
 app.post('/gracias', async (req, res) => {
