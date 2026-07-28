@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Publicar oferta de trabajo">
+  <section class="section">
+    <div class="container">
+      <h1>Publicar una oferta de trabajo</h1>
+
+      <div class="card" style="background:var(--teal-light); border-color:var(--teal); margin-bottom:12px;">
+        <p style="margin:0; font-size:14px;">
+          Solo se publican ofertas de empleo en el ámbito de la Comunidad de Madrid.
+        </p>
+      </div>
+      <div class="card" style="background:var(--teal-light); border-color:var(--teal); margin-bottom:1.5rem;">
+        <p style="margin:0; font-size:14px;">
+          La oferta se publica tras ser revisada por SOMIAMA, y permanece visible durante 3 meses.
+        </p>
+      </div>
+
+      <div class="card">
+        <form name="oferta-empleo" method="POST" action="/gracias" data-netlify="true" data-netlify-honeypot="bot-field">
+          <input type="hidden" name="form-name" value="oferta-empleo" />
+          <p style="display:none;"><label>No rellenar: <input name="bot-field" /></label></p>
+
+          <label>Nombre del ofertante<br/><input type="text" name="nombre" required style="width:100%; padding:8px; margin:4px 0 12px;" /></label>
+          <label>Cargo<br/><input type="text" name="cargo" required style="width:100%; padding:8px; margin:4px 0 12px;" /></label>
+          <label>Hospital o Servicio<br/><input type="text" name="institucion" required style="width:100%; padding:8px; margin:4px 0 12px;" /></label>
+          <label>Descripción del puesto<br/><textarea name="descripcion" rows="5" required style="width:100%; padding:8px; margin:4px 0 12px;"></textarea></label>
+          <label>Email de contacto<br/><input type="email" name="contacto" required style="width:100%; padding:8px; margin:4px 0 12px;" /></label>
+          <button type="submit" class="btn">Enviar oferta</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
